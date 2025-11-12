@@ -1,11 +1,8 @@
 "use client";
 
-import { JobCard } from "@/components/jobs/jobCard";
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
-type JobListProps = {
-  maxHeight?: number;
-};
+import { useJobsContext } from "@/components/jobs/jobsProvider";
 
 /**
  * JobList (loading placeholder)
@@ -24,6 +21,15 @@ export default function JobList(props: JobListProps = {}) {
   );
   const firstCardRef = useRef<HTMLDivElement | null>(null);
   const [cardHeight, setCardHeight] = useState<number>();
+  const { filteredJobs, selectJob, selectedJobId } = useJobsContext();
+  const firstJobKey = filteredJobs[0]?.id ?? null;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  const jobCount = filteredJobs.length;
+  const totalPages = isMobile ? 1 : Math.max(1, Math.ceil(jobCount / itemsPerPage));
+  const displayedJobs = isMobile
+    ? filteredJobs
+    : filteredJobs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -41,10 +47,7 @@ export default function JobList(props: JobListProps = {}) {
   }, []);
 
   useEffect(() => {
-    if (!isMobile) {
-      setCardHeight(undefined);
-      return;
-    }
+    if (!isMobile || filteredJobs.length === 0) return;
 
     const measure = () => {
       if (firstCardRef.current) {
@@ -52,24 +55,25 @@ export default function JobList(props: JobListProps = {}) {
       }
     };
 
-    const raf = requestAnimationFrame(measure);
+    measure();
     window.addEventListener("resize", measure);
     return () => {
-      cancelAnimationFrame(raf);
       window.removeEventListener("resize", measure);
     };
-  }, [isMobile]);
+  }, [isMobile, filteredJobs.length, firstJobKey]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [isMobile, jobCount]);
 
   const listStyle: CSSProperties = computedMaxHeight
-    ? { maxHeight: `calc(${computedMaxHeight}px - 128px)` }
+    ? { maxHeight: `calc(${computedMaxHeight}px - 177px)` }
     : {};
 
   if (isMobile && cardHeight) {
     listStyle.maxHeight = `${cardHeight}px`;
     listStyle.height = `${cardHeight}px`;
   }
-
-  const jobCount = 25;
 
   return (
     <section
@@ -79,23 +83,74 @@ export default function JobList(props: JobListProps = {}) {
     >
       <h2 className="text-lg font-semibold text-neutral-800">Latest Jobs</h2>
       <div
-        className={`flex-1 min-h-0 overflow-y-auto pr-2 snap-y snap-mandatory md:snap-none ${isMobile ? "space-y-0" : "space-y-2"}`}
+        className={
+          isMobile
+            ? "flex-1 min-h-0 overflow-y-auto pr-2 snap-y snap-mandatory space-y-0"
+            : "flex-1 min-h-0 space-y-2 overflow-y-auto pr-2"
+        }
         style={listStyle}
         role="list"
         aria-busy="true"
         aria-live="polite"
       >
-        {Array.from({ length: jobCount }).map((_, i) => (
-          <div
-            key={i}
-            ref={i === 0 ? firstCardRef : undefined}
-            className={`snap-start ${isMobile ? "sticky top-0 z-10 bg-white" : ""}`}
-          >
-            <JobCard />
-          </div>
-        ))}
+        {jobCount === 0 ? (
+          <p className="py-4 text-sm text-neutral-500">No jobs match your search yet.</p>
+        ) : (
+          displayedJobs.map((job, index) => (
+            <div
+              key={job.id}
+              ref={index === 0 ? firstCardRef : undefined}
+              className={`snap-start ${isMobile ? "sticky top-0 z-10 bg-white" : ""}`}
+            >
+              <button
+                type="button"
+                onClick={() => selectJob(job.id)}
+                className={`w-full rounded-xl border px-4 py-4 text-left shadow-sm transition ${
+                  job.id === selectedJobId
+                    ? "border-black bg-white"
+                    : "border-black/10 bg-white/95 hover:border-black/40"
+                }`}
+              >
+                <p className="text-sm font-medium text-neutral-900">{job.title}</p>
+                <p className="text-xs text-neutral-600">{job.company}</p>
+                <div className="mt-2 flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-neutral-500">
+                  {job.jobType && <span>{job.jobType}</span>}
+                  {job.experience && <span>{job.experience}</span>}
+                  {job.industry && <span>{job.industry}</span>}
+                  {job.role && <span>{job.role}</span>}
+                </div>
+              </button>
+            </div>
+          ))
+        )}
       </div>
-      {/* pagination placeholder can remain if desired */}
+      {!isMobile && jobCount > itemsPerPage && (
+        <div className="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            className="rounded-full border border-black/10 px-3 py-1 text-sm text-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-xs text-neutral-500">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            type="button"
+            className="rounded-full border border-black/10 px-3 py-1 text-sm text-neutral-700 disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   );
 }
+
+type JobListProps = {
+  maxHeight?: number;
+};

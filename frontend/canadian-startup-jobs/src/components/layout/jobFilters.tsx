@@ -1,35 +1,23 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { COLOURS } from "@/utils/constants";
+import {
+  DEFAULT_FILTERS,
+  FILTER_DROPDOWN_CONFIG,
+  FilterDropdownConfig,
+  FilterState,
+} from "@/components/jobs/filterConfig";
+import { useJobsContext } from "@/components/jobs/jobsProvider";
 
-export type DropdownFilters = {
-  province: string;
-  jobType: string;
-  experience: string;
-  industry: string;
-  role: string;
-};
-
-const PROVINCES = ["Any Province", "AB", "BC", "MB", "NB", "NL", "NS", "ON", "PE", "QC", "SK"];
-const JOB_TYPES = ["Any Job Type", "Full-time", "Part-time", "Contract", "Internship"];
-const EXPERIENCE = ["Any Experience", "Entry", "Intermediate", "Senior", "Leadership"];
-const INDUSTRIES = ["Any Industry", "Fintech", "Healthtech", "Cleantech", "AI & Data", "Consumer", "Enterprise SaaS"];
-const ROLES = ["Any Role", "Software Engineering", "Product Management", "Design", "Marketing", "Sales", "Operations"];
-
-const FIELDS: { key: keyof DropdownFilters; label: string; options: string[] }[] = [
-  { key: "province", label: "Province", options: PROVINCES },
-  { key: "jobType", label: "Job Type", options: JOB_TYPES },
-  { key: "experience", label: "Experience", options: EXPERIENCE },
-  { key: "industry", label: "Industry", options: INDUSTRIES },
-  { key: "role", label: "Role", options: ROLES },
-];
+export type DropdownFilters = FilterState;
 
 const INITIAL_STATE: DropdownFilters = {
-  province: PROVINCES[0],
-  jobType: JOB_TYPES[0],
-  experience: EXPERIENCE[0],
-  industry: INDUSTRIES[0],
-  role: ROLES[0],
+  province: "Any Province",
+  jobType: "Any Job Type",
+  experience: "Any Experience",
+  industry: "Any Industry",
+  role: "Any Role",
 };
 
 type JobFiltersProps = {
@@ -37,8 +25,8 @@ type JobFiltersProps = {
 };
 
 export default function JobFilters({ onChange }: JobFiltersProps) {
-  const [filters, setFilters] = useState<DropdownFilters>(INITIAL_STATE);
-  const [openKey, setOpenKey] = useState<keyof DropdownFilters | null>(null);
+  const { filters, setFilters } = useJobsContext();
+  const [openKey, setOpenKey] = useState<keyof FilterState | null>(null);
 
   useEffect(() => {
     onChange?.(filters);
@@ -54,27 +42,26 @@ export default function JobFilters({ onChange }: JobFiltersProps) {
 
   const activeCount = useMemo(
     () =>
-      Number(filters.province !== PROVINCES[0]) +
-      Number(filters.jobType !== JOB_TYPES[0]) +
-      Number(filters.experience !== EXPERIENCE[0]) +
-      Number(filters.industry !== INDUSTRIES[0]) +
-      Number(filters.role !== ROLES[0]),
+      FILTER_DROPDOWN_CONFIG.reduce(
+        (count, { key, defaultValue }) => count + Number(filters[key] !== defaultValue),
+        0
+      ),
     [filters]
   );
 
-  const handleSelect = (key: keyof DropdownFilters, value: string) => {
+  const handleSelect = (key: keyof FilterState, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
     setOpenKey(null);
   };
 
   const handleReset = () => {
-    setFilters(INITIAL_STATE);
+    setFilters(DEFAULT_FILTERS);
     setOpenKey(null);
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    onChange?.(filters);
+    setOpenKey(null);
   };
 
   return (
@@ -85,15 +72,14 @@ export default function JobFilters({ onChange }: JobFiltersProps) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {FIELDS.map(({ key, label, options }) => (
+        {FILTER_DROPDOWN_CONFIG.map((config) => (
           <DropdownField
-            key={key}
-            label={label}
-            value={filters[key]}
-            options={options}
-            isOpen={openKey === key}
-            onToggle={() => setOpenKey((prev) => (prev === key ? null : key))}
-            onSelect={(value) => handleSelect(key, value)}
+            key={config.key}
+            config={config}
+            value={filters[config.key]}
+            isOpen={openKey === config.key}
+            onToggle={() => setOpenKey((prev) => (prev === config.key ? null : config.key))}
+            onSelect={(value) => handleSelect(config.key, value)}
           />
         ))}
       </div>
@@ -101,7 +87,8 @@ export default function JobFilters({ onChange }: JobFiltersProps) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="flex-1 rounded-full bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-black/90"
+          className="flex-1 rounded-full px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-1"
+          style={{ backgroundColor: COLOURS.primary }}
         >
           Apply
         </button>
@@ -118,15 +105,15 @@ export default function JobFilters({ onChange }: JobFiltersProps) {
 }
 
 type DropdownFieldProps = {
-  label: string;
+  config: FilterDropdownConfig;
   value: string;
-  options: string[];
   isOpen: boolean;
   onToggle: () => void;
   onSelect: (value: string) => void;
 };
 
-function DropdownField({ label, value, options, isOpen, onToggle, onSelect }: DropdownFieldProps) {
+function DropdownField({ config, value, isOpen, onToggle, onSelect }: DropdownFieldProps) {
+  const { label, options } = config;
   return (
     <div className="relative">
       <button
@@ -146,7 +133,7 @@ function DropdownField({ label, value, options, isOpen, onToggle, onSelect }: Dr
       {isOpen && (
         <ul
           role="listbox"
-          className="absolute z-20 mt-2 w-full max-h-56 overflow-y-auto rounded-lg border border-black/10 bg-white p-2 text-sm shadow-lg"
+          className="absolute z-40 mt-2 w-full max-h-56 overflow-y-auto rounded-lg border border-black/10 bg-white p-2 text-sm shadow-lg"
         >
           {options.map((option) => (
             <li key={option}>

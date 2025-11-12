@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import SWRProvider from "@/components/SWRProvider";
 import { Sidebar } from "@/components/HomePageClient";
 import { Footer } from "@/components/layout/footer";
+import { JobsProvider } from "@/components/jobs/jobsProvider";
 
 const canadianFlagEmoji = "\u{1F1E8}\u{1F1E6}";
 const emojiFaviconSvg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
@@ -66,10 +67,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           >
             <main className="flex-1 overflow-hidden px-4 py-4 sm:px-5 lg:px-8">
               <SWRProvider>
-                <div className="grid h-full gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
-                  <Sidebar pageTitle="Canadian Startup Jobs" />
-                  <div className="min-h-0 overflow-hidden">{children}</div>
-                </div>
+                <JobsProvider>
+                  <div className="grid h-full gap-4 overflow-visible lg:grid-cols-[280px_minmax(0,1fr)]">
+                    <Sidebar pageTitle="Canadian Startup Jobs" />
+                    <div className="min-h-0 overflow-visible">{children}</div>
+                  </div>
+                </JobsProvider>
               </SWRProvider>
             </main>
             <Footer />
