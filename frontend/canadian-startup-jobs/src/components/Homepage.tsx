@@ -9,8 +9,29 @@ import { COLOURS } from "@/utils/constants";
 const Homepage: React.FC = () => { 
   const heroViewportRef = useRef<HTMLDivElement | null>(null);
   const [heroMaxHeight, setHeroMaxHeight] = useState<number>();
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsDesktop(mediaQuery.matches);
+
+    update();
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", update);
+      return () => mediaQuery.removeEventListener("change", update);
+    }
+
+    mediaQuery.addListener(update);
+    return () => mediaQuery.removeListener(update);
+  }, []);
+
+  useEffect(() => {
+    if (!isDesktop) {
+      setHeroMaxHeight(undefined);
+      return;
+    }
+
     const update = () => {
       const node = heroViewportRef.current;
       if (!node) return;
@@ -38,22 +59,24 @@ const Homepage: React.FC = () => {
       window.removeEventListener("scroll", update, true);
       observer?.disconnect();
     };
-  }, []);
+  }, [isDesktop]);
 
   return (
     <div className="flex min-h-0 flex-col overflow-visible">
       <div className="shrink-0">
         <Header />
       </div>
-      <div className="flex min-h-0 flex-col overflow-visible">
-        <div
-          ref={heroViewportRef}
-          className="flex-1 min-h-0 overflow-hidden px-4 pb-6 sm:px-6 lg:px-8"
-          style={{ backgroundColor: COLOURS.background }}
-        >
-          <HeroSection maxHeight={heroMaxHeight} />
+      {isDesktop && (
+        <div className="flex min-h-0 flex-col overflow-visible">
+          <div
+            ref={heroViewportRef}
+            className="flex-1 min-h-0 overflow-hidden px-4 pb-6 sm:px-6 lg:px-8"
+            style={{ backgroundColor: COLOURS.background }}
+          >
+            <HeroSection maxHeight={heroMaxHeight} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

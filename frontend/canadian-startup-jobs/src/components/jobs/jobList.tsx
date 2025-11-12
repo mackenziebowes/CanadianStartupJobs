@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { useRouter } from "next/navigation";
 import { useJobsContext } from "@/components/jobs/jobsProvider";
 
 /**
@@ -17,14 +18,15 @@ export default function JobList(props: JobListProps = {}) {
   const computedMaxHeight =
     typeof maxHeight === "number" ? Math.max(160, maxHeight) : undefined;
   const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" && window.matchMedia("(max-width: 1020px)").matches
+    typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches
   );
   const firstCardRef = useRef<HTMLDivElement | null>(null);
   const [cardHeight, setCardHeight] = useState<number>();
   const { filteredJobs, selectJob, selectedJobId } = useJobsContext();
   const firstJobKey = filteredJobs[0]?.id ?? null;
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 4;
+  const router = useRouter();
   const jobCount = filteredJobs.length;
   const totalPages = isMobile ? 1 : Math.max(1, Math.ceil(jobCount / itemsPerPage));
   const displayedJobs = isMobile
@@ -33,7 +35,7 @@ export default function JobList(props: JobListProps = {}) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mediaQuery = window.matchMedia("(max-width: 1020px)");
+    const mediaQuery = window.matchMedia("(max-width: 1023px)");
     const updateMatch = () => setIsMobile(mediaQuery.matches);
 
     updateMatch();
@@ -65,6 +67,14 @@ export default function JobList(props: JobListProps = {}) {
   useEffect(() => {
     setCurrentPage(1);
   }, [isMobile, jobCount]);
+
+  const handleJobClick = (jobId: string) => {
+    if (isMobile) {
+      router.push(`/jobs/${jobId}`);
+      return;
+    }
+    selectJob(jobId);
+  };
 
   const listStyle: CSSProperties = computedMaxHeight
     ? { maxHeight: `calc(${computedMaxHeight}px - 177px)` }
@@ -104,7 +114,7 @@ export default function JobList(props: JobListProps = {}) {
             >
               <button
                 type="button"
-                onClick={() => selectJob(job.id)}
+                onClick={() => handleJobClick(job.id)}
                 className={`w-full rounded-xl border px-4 py-4 text-left shadow-sm transition ${
                   job.id === selectedJobId
                     ? "border-black bg-white"
