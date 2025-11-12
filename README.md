@@ -10,7 +10,7 @@ CanadianStartupJobs is built to strengthen Canada’s startup ecosystem by makin
 - **Communities** to highlight the impact of Canadian entrepreneurship.
 
 ## Features (Planned)
-- Search and filter jobs by province, industry, or startup stage  
+- Search and filter jobs
 - Verified Canadian-owned startups only  
 - Simple job posting and management dashboard for founders
 - Public API for regional innovation hubs and directories, such as university accelerators
