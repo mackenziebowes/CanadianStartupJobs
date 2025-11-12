@@ -1,9 +1,9 @@
-export default function HomePage() {
+import Homepage from "@/components/Homepage";
+
+export default function Page() {
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-semibold text-gray-800">
-        Welcome to Canadian Startup Jobs
-      </h1>
+    <main className="flex min-h-0 flex-col overflow-hidden bg-neutral-50">
+      <Homepage />
     </main>
   );
 }
