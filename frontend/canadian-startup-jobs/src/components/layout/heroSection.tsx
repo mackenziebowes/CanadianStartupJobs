@@ -1,20 +1,42 @@
 import React from "react";
+import type { CSSProperties } from "react";
 import { COLOURS } from "@/utils/constants";
 import { useJobsContext } from "@/components/jobs/jobsProvider";
 
-const HeroSection: React.FC = () => {
+type HeroSectionProps = {
+  maxHeight?: number;
+};
+
+const HeroSection: React.FC<HeroSectionProps> = ({ maxHeight } = {}) => {
   const { selectedJob } = useJobsContext();
+  const computedMaxHeight =
+    typeof maxHeight === "number" ? Math.max(160, maxHeight) : undefined;
+
+  const baseStyle: CSSProperties = {
+    backgroundColor: COLOURS.background,
+    borderColor: COLOURS.border,
+  };
+
+  if (computedMaxHeight) {
+    baseStyle.maxHeight = computedMaxHeight;
+  }
 
   if (!selectedJob) {
     return (
       <section
         className="flex h-full items-center justify-center rounded-2xl border p-10 text-center shadow-sm"
-        style={{ backgroundColor: COLOURS.background, borderColor: COLOURS.border }}
+        style={baseStyle}
       >
-        <p className="text-sm text-neutral-600">No jobs match your search. Adjust the filters to explore more roles.</p>
+        <p className="text-sm text-neutral-600">
+          No jobs match your search. Adjust the filters to explore more roles.
+        </p>
       </section>
     );
   }
+
+  const sectionStyle: CSSProperties = computedMaxHeight
+    ? { maxHeight: `calc(${computedMaxHeight}px - 140px)` }
+    : {};
 
   const paragraphs =
     typeof selectedJob.description === "string"
@@ -24,7 +46,7 @@ const HeroSection: React.FC = () => {
   return (
     <section
       className="flex h-full flex-col gap-6 overflow-y-auto rounded-2xl border p-8 shadow-sm"
-      style={{ backgroundColor: COLOURS.background, borderColor: COLOURS.border }}
+      style={sectionStyle}
     >
       <div className="space-y-2">
         <p className="text-sm font-semibold uppercase tracking-wide text-neutral-600">{selectedJob.company}</p>
