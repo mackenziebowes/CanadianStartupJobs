@@ -163,4 +163,4 @@ https://www.foundersbeta.com/startup-directory/categories/waterloo-startup-accel
 - TMU Cybersecure: https://cybersecurecatalyst.ca/catalyst-cyber-accelerator/
 - Bioenterprise Canada: https://bioenterprise.ca/member-directory/
 - Toronto Business Development Centre: https://tbdc.com/
-- https://www.theforum.ca/
+- The Forum: https://www.theforum.ca/
