@@ -29,6 +29,7 @@ const jobBoardCaches = pgTable("job_board_caches", {
   lastCheckedAt: timestamp("last_checked_at").defaultNow().notNull(),
 });
 
+
 export {
   organizations,
   jobBoardCaches,

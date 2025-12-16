@@ -11,6 +11,7 @@
     "@canadian-startup-jobs/db": "workspace:*",
     "@mendable/firecrawl-js": "^4.9.0",
     "ai": "^5.0.113",
+    "drizzle-zod": "^0.8.3",
     "hono": "^4.10.8",
     "zod": "^4.1.13"
   },
