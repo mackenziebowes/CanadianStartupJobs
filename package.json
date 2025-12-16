@@ -1,0 +1,17 @@
+{
+  "name": "canadian-startup-jobs-monorepo",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "private": true,
+  "scripts": {
+    "dev": "bun --filter '*' dev",
+    "db:generate": "bun --filter db db:generate",
+    "db:migrate": "bun --filter db db:migrate",
+    "db:push": "bun --filter db db:push"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
