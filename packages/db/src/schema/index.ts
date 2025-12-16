@@ -33,22 +33,9 @@ import {
   portfolioCaches,
   sourcesPortfolioCaches,
 } from "./sources/index";
-import { createSchemaFactory } from "drizzle-zod";
-const { createInsertSchema, createSelectSchema, createUpdateSchema } = createSchemaFactory({
-  coerce: {
-    date: true
-  }
-});
-const schemas = {
-  organizations: {
-    select: createSelectSchema(organizations),
-    insert: createInsertSchema(organizations),
-    update: createUpdateSchema(organizations),
-  }
-};
+
 
 export {
-  schemas,
   organizations,
   jobBoardCaches,
   orgsSizes,
