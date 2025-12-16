@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun run index.ts",
+    "dev": "bun run src/index.ts",
     "test": "bun run test.ts",
-    "worker": "bun run workers/workers.ts",
-    "test-bullmq": "bun run test-bullmq.ts",
-    "clear-queues": "bun run clear-queues.ts",
-    "board": "bun run bull-board-server.ts"
+    "worker": "bun run src/workers/workers.ts",
+    "test-bullmq": "bun run src/tests/integration/test-bullmq.ts",
+    "clear-queues": "bun run src/lib/clear-queues.ts",
+    "board": "bun run src/lib/bull-board-server.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.45",
