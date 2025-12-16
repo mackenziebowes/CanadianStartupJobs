@@ -19,6 +19,9 @@
           typescript
           typescript-language-server
           bun
+          docker
+          docker-compose
+          redis
         ];
 
         # Optional: Runs when you enter the shell
