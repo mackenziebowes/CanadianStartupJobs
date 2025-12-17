@@ -1,0 +1,16 @@
+export const ErrorCodes = {
+  // General
+  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  VALIDATION_ERROR: "VALIDATION_ERROR",
+  
+  // Scraper/Cache
+  CACHE_FETCH_FAILED: "CACHE_FETCH_FAILED",
+  CACHE_HASH_FAILED: "CACHE_HASH_FAILED",
+  CACHE_INSERT_FAILED: "CACHE_INSERT_FAILED",
+  
+  // DB
+  DB_INSERT_FAILED: "DB_INSERT_FAILED",
+  DB_QUERY_FAILED: "DB_QUERY_FAILED",
+} as const;
+
+export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
