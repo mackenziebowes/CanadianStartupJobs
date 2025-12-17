@@ -8,6 +8,7 @@ import {
   orgsProvinces,
   orgsIndustries,
   orgsJobs,
+   orgsJobBoardCaches,
   jobs,
   jobCaches,
   jobsRoles,
@@ -68,6 +69,11 @@ const schemas = {
     select: createSelectSchema(orgsJobs),
     insert: createInsertSchema(orgsJobs),
     update: createUpdateSchema(orgsJobs),
+  },
+  orgsJobBoardCaches: {
+    select: createSelectSchema(orgsJobBoardCaches),
+    insert: createInsertSchema(orgsJobBoardCaches),
+    update: createUpdateSchema(orgsJobBoardCaches),
   },
   // Additional schemas mirroring the imports from ./schema/index
   jobs: {
@@ -184,6 +190,7 @@ export const db = drizzle(client, {
     orgsProvinces,
     orgsIndustries,
     orgsJobs,
+    orgsJobBoardCaches,
     jobs,
     jobCaches,
     jobsRoles,
@@ -216,6 +223,7 @@ export {
   orgsProvinces,
   orgsIndustries,
   orgsJobs,
+  orgsJobBoardCaches,
   jobs,
   jobCaches,
   jobsRoles,

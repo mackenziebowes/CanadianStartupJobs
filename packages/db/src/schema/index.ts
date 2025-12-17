@@ -8,6 +8,7 @@ import {
   orgsProvinces,
   orgsIndustries,
   orgsJobs,
+  orgsJobBoardCaches,
 } from "./organizations/index";
 import {
   jobs,
@@ -43,6 +44,7 @@ export {
   orgsProvinces,
   orgsIndustries,
   orgsJobs,
+  orgsJobBoardCaches,
   jobs,
   jobCaches,
   jobsRoles,
