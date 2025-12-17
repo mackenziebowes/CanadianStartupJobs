@@ -138,8 +138,8 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Ignore all in prompts dir
-/prompts/
 
-# Ignore planning docs
+# Mackenzie's Local Agentic Metaprompting Tools
 /planning/
+/work-journal/
+/notes/

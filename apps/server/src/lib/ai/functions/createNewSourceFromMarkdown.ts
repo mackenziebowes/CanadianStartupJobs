@@ -2,6 +2,7 @@ import { google } from '@ai-sdk/google';
 import { db, schemas, sources,  } from "@canadian-startup-jobs/db";
 import { generateObject } from "ai";
 import { prompts } from '@/lib/ai/prompts';
+import { AppError, ERROR_CODES } from '@/lib/errors';
 
 type NewSource = typeof sources.$inferInsert;
 const insertSource = async (source: NewSource) => {
@@ -9,8 +10,8 @@ const insertSource = async (source: NewSource) => {
 };
 
 export const createNewSourceFromMarkdown = async (markdown: string, url: string, portfolio: string) => {
-  const { object } = await generateObject({
-    model: google('gemini-1.5-pro-latest'),
+  const objectData = await generateObject({
+    model: google('gemini-2.5-pro-latest'),
     schema: schemas.sources.insert.omit({
         id: true,
         createdAt: true,
@@ -18,13 +19,12 @@ export const createNewSourceFromMarkdown = async (markdown: string, url: string,
     }),
     prompt: prompts.getNewSource(markdown, url, portfolio)
   });
-
+   if (!objectData.object) throw new AppError(ERROR_CODES.AI_OBJECT_CREATION_FAILED, "Failed to extract source object", {...objectData});
   const newSource = await insertSource({
-    ...(object as NewSource),
+    ...objectData.object,
     website: url,
     portfolio: portfolio,
   });
-
-  console.log("✅ New source created.", newSource);
+  if (!newSource[0]) throw new AppError(ERROR_CODES.DB_INSERT_FAILED, "Failed to insert source to db");
   return newSource;
 };
