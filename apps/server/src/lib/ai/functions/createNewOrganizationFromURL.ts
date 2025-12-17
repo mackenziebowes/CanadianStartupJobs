@@ -102,7 +102,7 @@ export const createNewOrganizationFromURL = async (url: string) => {
     ...(uploadValues.data),
     website: url,
   });
-
-  console.log("✅ New source created.", newOrganization);
-  return newOrganization;
+  if (!newOrganization[0]) throw new AppError(ERROR_CODES.DB_INSERT_FAILED, "Failed to insert extracted organization to db");
+  console.log("✅ New Organization created.");
+  return newOrganization[0];
 };

@@ -1,4 +1,4 @@
-import { createNewSourceFromMarkdown } from "@/lib/ai/functions/createNewSourceFromMarkdown";
+import { sources } from "@/lib/ai";
 import Firecrawl from "@mendable/firecrawl-js";
 import { join } from "node:path";
 
@@ -38,7 +38,7 @@ const getTestDocs = async () => {
 async function main() {
   const { home, portfolio } = await getTestDocs();
   if (!home.markdown) return null;
-  await createNewSourceFromMarkdown(home.markdown, testVC.url, testVC.portfolio);
+  await sources.createNewSourceFromMarkdown(home.markdown, testVC.url, testVC.portfolio);
   console.log("Done :)");
 }
 

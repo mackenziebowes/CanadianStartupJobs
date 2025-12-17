@@ -34,8 +34,9 @@ name: text("name").notNull(),
 city: text("city").notNull(),
 province: text("province").notNull(),
 description: text("description").notNull(),
-website: text("website"),
-industry: text("industry"),
+website: text("website").notNull(),
+careersPage: text("careersPage").notNull(),
+industry: text("industry").notNull(),
 
 <!-- /Goal -->
 `;

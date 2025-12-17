@@ -15,6 +15,7 @@ const organizations = pgTable("organizations", {
   province: text("province").notNull(),
   description: text("description").notNull(),
   website: text("website"),
+  careersPage: text("careers_page"),
   industry: text("industry"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
