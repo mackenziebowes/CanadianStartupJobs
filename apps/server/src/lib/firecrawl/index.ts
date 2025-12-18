@@ -1,6 +1,6 @@
 import { firecrawl } from "./client";
 import { searchSiteMap, mapSite } from "./functions/utils/map";
-import { getLinks, getSummary, getMarkdown } from "./functions/utils/scrape";
+import { getLinks, getSummary, getMarkdown, getMdAndLinks } from "./functions/utils/scrape";
 import { getBasicOrg, searchOrg } from "./functions/getNewOrganization";
 
 import { CACHE_TIME_LIMITS_MS } from "./config";
@@ -10,7 +10,8 @@ const utils = {
   mapSite,
   getLinks,
   getSummary,
-  getMarkdown
+  getMarkdown,
+  getMdAndLinks
 };
 
 const org = {

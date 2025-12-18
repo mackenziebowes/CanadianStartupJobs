@@ -31,20 +31,19 @@ const orderStatement = (order?: "asc" | "desc"): typeof orderAsc => {
 
 const create_teamSize = async (
   insert: teamSizeInsert,
-): Promise<boolean> => {
+) => {
   const result = await db
     .insert(teamSize)
     .values(insert)
     .onConflictDoNothing()
     .returning({ id: teamSize.id });
   if (result.length == 0) return false;
-  return true;
+  return result;
 };
-
 
 const delete_teamSize = async (
   select: teamSizeSelect,
-): Promise<boolean> => {
+) => {
   const result = await db
     .delete(teamSize)
     .where(eq(teamSize.id, select.id))
@@ -57,7 +56,7 @@ const get_teamSize = async (
   skip?: number,
   take?: number,
   order?: "asc" | "desc",
-): Promise<teamSizeSelect[]> => {
+) => {
   const experienceLevelResults = await db
     .select()
     .from(teamSize)
@@ -70,14 +69,14 @@ const get_teamSize = async (
 const update_teamSize = async (
   select: teamSizeSelect,
   insert: teamSizeInsert,
-): Promise<boolean> => {
+) => {
   const result = await db
     .update(teamSize)
     .set(insert)
     .where(eq(teamSize.id, select.id))
     .returning({ updatedId: teamSize.id });
   if (result.length == 0) return false;
-  return true;
+  return result;
 };
 
 export {

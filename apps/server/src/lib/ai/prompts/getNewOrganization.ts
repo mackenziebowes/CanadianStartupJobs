@@ -7,9 +7,6 @@ description: text("description").notNull(),
 website: text("website"),
 industry: text("industry"),
 */
-
-import { ZodObject } from "zod";
-
 export const discoverNewOrganization = (markdown: string, links: string[], url: string) => `
 ## Context:
 

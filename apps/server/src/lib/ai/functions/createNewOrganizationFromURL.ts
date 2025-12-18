@@ -1,86 +1,48 @@
 import { google } from '@ai-sdk/google';
 import { db, schemas, organizations, } from "@canadian-startup-jobs/db";
 import { generateObject, generateText, stepCountIs, tool } from "ai";
+import type { GenerateTextResult, Tool } from 'ai';
 import { prompts } from '@/lib/ai/prompts';
+import { readPage, searchSite } from '@/lib/ai/tools';
 import { AppError, ERROR_CODES } from "@/lib/errors";
-import { org } from '@/lib/firecrawl';
-import z from "zod";
-import { MapData } from '@mendable/firecrawl-js';
-
-/**
-* 2 pass dev:
-* pass 1 => Organizations *only*
-* pass 2 => Organizations + tags
-*/
+import { utils } from '@/lib/firecrawl';
 
 type NewOrganization = typeof organizations.$inferInsert;
 const insertOrganization = async (source: NewOrganization) => {
   return await db.insert(organizations).values(source).returning();
 };
 
-const readPageResult = (url: string, markdown: string, links: string[]) => {
-  return `
-## Read Page Results for ${url}
-### Markdown View
-\`\`\`md
-${markdown}
-\`\`\`
-### All Links
-\`\`\`md
-${links.map((link => `- ${link},`)).join("\n")}
-\`\`\`
-`;
-};
-
-const searchSiteResult = (url: string, searchTerm: string, results: MapData) => {
-  return `
-## Search Site Results for "${searchTerm}" in ${url}:
-
-### Results
-${results.links.map((link) => {
-  return `
-- **URL:** ${link.url}
-- **Category:** ${link?.category ?? "Not Found"}
-- **Title:** ${link?.title ?? "Not Found"}
-- **Description:** ${link?.description ?? "Not Found"}
-`;
-}).join("\n-----\n")}
-`;
-}
-
 const tools = {
-  readPage: tool({
-    description: "Get a clean markdown view of a URL",
-    inputSchema: z.string().describe("The complete url to view"),
-    execute: async (url: string) => {
-      const results = await org.getBasicOrg(url);
-      if (!results.markdown || !results.links) return "Error with site reading tool.";
-      return readPageResult(url, results.markdown, results.links);
-    }
-  }),
-  searchSite: tool({
-    description: "Search a sitemap for a term",
-    inputSchema: z.object({
-      url: z.string().describe("The complete url of a page in the website to search"),
-      searchTerm: z.string().describe("The term to search for across the site map"),
-    }),
-    execute: async ({url, searchTerm}) => {
-      const results = await org.searchOrg(url, searchTerm);
-      if (!results.links) return "Error with site searching tool.";
-      return searchSiteResult(url, searchTerm, results);
-    }
-  })
+  readPage,
+  searchSite,
 }
 
-export const createNewOrganizationFromURL = async (url: string) => {
-  const { markdown, links } = await org.getBasicOrg(url);
+const getHomePage = async (url: string) => {
+  const { markdown, links } = await utils.getMdAndLinks(url);
   if (!markdown) throw new AppError(ERROR_CODES.FC_MARKDOWN_FAILED, `Failed to get markdown for ${url}`);
   if (!links) throw new AppError(ERROR_CODES.FC_LINKS_FAILED, `Failed to get links for ${url}`);
-  const primaryData = await generateText({
+  return { markdown, links };
+}
+
+const getPrimaryData = async (markdown: string, links: string[], url: string) => {
+  return await generateText({
     model: google('gemini-2.5-pro'),
     prompt: prompts.discoverNewOrganization(markdown, links, url),
     tools,
-  })
+  });
+}
+
+const getTagData = async (markdown: string, links: string[], url: string) => {
+  /* blocked by @/lib/tools/db completion, in turn blocked by @/functions/tags and @/functions/pivots completion. */
+}
+
+const getObjectData = async (url: string, primaryData: GenerateTextResult<{
+    readPage: Tool<string, string>;
+    searchSite: Tool<{
+        url: string;
+        searchTerm: string;
+    }, string>;
+}, never>) => {
   const objectData = await generateObject({
     model: google('gemini-2.5-pro'),
     schema: schemas.organizations.insert.omit({
@@ -91,6 +53,14 @@ export const createNewOrganizationFromURL = async (url: string) => {
     prompt: prompts.getNewOrganization(primaryData.text, url),
   });
   if (!objectData.object) throw new AppError(ERROR_CODES.AI_OBJECT_CREATION_FAILED, "Failed to extract organization object", {...objectData});
+  return objectData
+}
+
+export const createNewOrganizationFromURL = async (url: string) => {
+  const { markdown, links } = await getHomePage(url);
+  const primaryData = await getPrimaryData(markdown, links, url);
+  const objectData = await getObjectData(url, primaryData);
+
   const uploadValues = schemas.organizations.insert.omit({
     id: true,
     createdAt: true,
