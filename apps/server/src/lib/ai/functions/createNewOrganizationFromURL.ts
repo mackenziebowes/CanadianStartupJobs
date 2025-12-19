@@ -1,21 +1,19 @@
 import { google } from '@ai-sdk/google';
 import { db, schemas, organizations, } from "@canadian-startup-jobs/db";
 import { generateObject, generateText, stepCountIs, tool } from "ai";
+import { z } from "zod";
 import type { GenerateTextResult, Tool } from 'ai';
 import { prompts } from '@/lib/ai/prompts';
 import { readPage, searchSite } from '@/lib/ai/tools';
+import { observePrepareSteps } from '@/lib/ai/observability';
 import { AppError, ERROR_CODES } from "@/lib/errors";
+import { autoTagOrganization } from '@/lib/ai/functions/autoTagOrganization';
 import { utils } from '@/lib/firecrawl';
 
 type NewOrganization = typeof organizations.$inferInsert;
 const insertOrganization = async (source: NewOrganization) => {
   return await db.insert(organizations).values(source).returning();
 };
-
-const tools = {
-  readPage,
-  searchSite,
-}
 
 const getHomePage = async (url: string) => {
   const { markdown, links } = await utils.getMdAndLinks(url);
@@ -28,16 +26,20 @@ const getPrimaryData = async (markdown: string, links: string[], url: string) =>
   return await generateText({
     model: google('gemini-2.5-pro'),
     prompt: prompts.discoverNewOrganization(markdown, links, url),
-    tools,
+    tools: {
+      readPage,
+      searchSite,
+    },
+    prepareStep: observePrepareSteps("Primary"),
   });
 }
 
-const getTagData = async (markdown: string, links: string[], url: string) => {
-  /* blocked by @/lib/tools/db completion, in turn blocked by @/functions/tags and @/functions/pivots completion. */
-}
+
 
 const getObjectData = async (url: string, primaryData: GenerateTextResult<{
-    readPage: Tool<string, string>;
+    readPage: Tool<{
+        url: string;
+    }, string>;
     searchSite: Tool<{
         url: string;
         searchTerm: string;
@@ -49,6 +51,8 @@ const getObjectData = async (url: string, primaryData: GenerateTextResult<{
         id: true,
         createdAt: true,
         updatedAt: true,
+    }).extend({
+        careersPage: z.string().describe("The URL of the careers page"),
     }),
     prompt: prompts.getNewOrganization(primaryData.text, url),
   });
@@ -74,5 +78,11 @@ export const createNewOrganizationFromURL = async (url: string) => {
   });
   if (!newOrganization[0]) throw new AppError(ERROR_CODES.DB_INSERT_FAILED, "Failed to insert extracted organization to db");
   console.log("✅ New Organization created.");
+  console.log("Launching tagging agent...");
+  const newOrgWithURL = {
+    ...newOrganization[0],
+    website: url,
+  }
+  await autoTagOrganization(JSON.stringify(newOrgWithURL), markdown, links, url);
   return newOrganization[0];
 };

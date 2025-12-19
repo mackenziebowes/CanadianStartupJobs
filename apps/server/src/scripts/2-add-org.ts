@@ -1,7 +1,7 @@
 import { organizations } from "@/lib/ai";
 import { AppError, ERROR_CODES } from "@/lib/errors";
 
-const testOrg = "https://www.stay22.com/";
+const testOrg = "https://trayt.health/";
 
 async function main() {
   const newOrganization = await organizations.createNewOrganizationFromURL(testOrg);

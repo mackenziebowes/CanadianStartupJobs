@@ -7,9 +7,9 @@ This document outlines essential information for agents working within the `Cana
 The `CanadianStartupJobs` repository is a monorepo containing four main components:
 
 *   **`db`**: Database schema, ORM (Drizzle), and migrations.
-*   **`backend/scraper-cron`**: Job discovery and scraping service (BullMQ, Redis, Firecrawl).
-*   **`backend/server`**: REST API service (Hono) for accessing data.
-*   **`frontend/canadian-startup-jobs`**: Next.js application for the job board.
+*   **`apps/cron`**: Job discovery and scraping service (BullMQ, Redis, Firecrawl).
+*   **`apps/server`**: REST API service (Hono) for accessing data.
+*   **`apps/web`**: Next.js application for the job board.
 
 ## 2. Key Technologies
 
@@ -34,8 +34,8 @@ Path: `/db/`
 *   `npm run docs`: Generate `SCHEMA.md` documentation and copy it to other projects.
 *   `npm run build`: Compile TypeScript.
 
-### 3.2. `backend/scraper-cron` (Scraper)
-Path: `/backend/scraper-cron/`
+### 3.2. `apps/cron` (Scraper)
+Path: `/apps/cron/`
 *Manager: pnpm (pinned)*
 
 *   `npm run dev`: Run the scraper entry point.
@@ -44,16 +44,16 @@ Path: `/backend/scraper-cron/`
 *   `npm run clear-queues`: Purge all queues.
 *   `npm run test`: Run unit/integration tests.
 
-### 3.3. `backend/server` (API)
-Path: `/backend/server/`
+### 3.3. `apps/server` (API)
+Path: `/apps/server/`
 *Runtime: Bun*
 
 *   `bun run dev`: Start Hono server with hot reload.
 *   `bun run gen:tags`: Generate tag helper functions.
 *   `bun run gen:piv:jobs`: Generate job pivot helper functions.
 
-### 3.4. `frontend/canadian-startup-jobs` (Frontend)
-Path: `/frontend/canadian-startup-jobs/`
+### 3.4. `apps/web` (Frontend)
+Path: `/apps/web/`
 
 *   `npm run dev`: Start Next.js dev server.
 *   `npm run build`: Production build.
@@ -67,13 +67,13 @@ Path: `/`
 
 ## 4. Code Organization
 
-*   **Monorepo**: Separate packages for `db`, `backend/*`, and `frontend`.
+*   **Monorepo**: Separate packages for `db`, `apps/*`.
 *   **Shared Schema**: The `db` package exports the schema and connection logic.
-*   **Documentation (`SCHEMA.md`)**: The `db` project generates a `SCHEMA.md` file that is automatically copied to `backend/scraper-cron` and `backend/server`. **Read this file** to understand the current database structure.
+*   **Documentation (`SCHEMA.md`)**: The `db` project generates a `SCHEMA.md` file that is automatically copied to `apps/cron` and `apps/server`. **Read this file** to understand the current database structure.
 *   **Scraper Architecture**:
     *   **Discovery**: `mapCompanyDirWorker` finds sources.
     *   **Extraction**: `jobBoardWorker` scrapes jobs using Firecrawl.
-    *   See `backend/scraper-cron/GUIDES/data-pipeline.md` for detailed data flow.
+    *   See `apps/cron/GUIDES/data-pipeline.md` for detailed data flow.
 
 ## 5. Development Patterns
 
@@ -84,8 +84,8 @@ Path: `/`
 4.  Run `npm run docs` to update `SCHEMA.md` across the repo.
 
 ### Scraper Logic
-*   **Workers**: Located in `backend/scraper-cron/src/workers/`.
-*   **Queues**: Defined in `backend/scraper-cron/src/lib/queues.ts`.
+*   **Workers**: Located in `apps/cron/src/workers/`.
+*   **Queues**: Defined in `apps/cron/src/lib/queues.ts`.
 *   **Direct Execution**: Use `tsx` for running scripts/workers directly.
 
 ### API Development
@@ -97,11 +97,11 @@ Path: `/`
 *   **Database Ports**: Host connects via port **5433** (mapped to container 5432).
 *   **Environment Variables**: Check `.env.example` in each directory. Config is decentralized.
 *   **Package Managers**:
-    *   `backend/server` uses `bun`.
-    *   `backend/scraper-cron` specifies `pnpm`.
-    *   `db` and `frontend` use `npm`/`bun` interchangeably (lockfiles exist for Bun).
+    *   `apps/server` uses `bun`.
+    *   `apps/cron` specifies `pnpm`.
+    *   `db` and `apps/web` use `npm`/`bun` interchangeably (lockfiles exist for Bun).
     *   *Advice*: Use `npm run` for script compatibility, or `bun run` if specifically in the server directory.
-*   **Schema Sync**: If you change the DB schema, you **must** run `npm run docs` in `/db` to propagate the documentation to other services, or agents might hallucinate old schema fields.
+    *   **Schema Sync**: If you change the DB schema, you **must** run `npm run docs` in `/db` to propagate the documentation to other services, or agents might hallucinate old schema fields.
 
 ## 7. Testing
 *   **Backend**: `tsx test.ts` in scraper service.

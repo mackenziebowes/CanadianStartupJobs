@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "gen:tags": "bun run src/scripts/createTagFunctions.ts",
-    "gen:piv:jobs": "bun run src/scripts/createJobPivotFunctions.ts"
+    "gen:piv:jobs": "bun run src/scripts/createJobPivotFunctions.ts",
+    "gen:piv:orgs": "bun run src/scripts/createOrgPivotFunctions.ts"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.46",

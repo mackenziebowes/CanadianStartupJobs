@@ -1,5 +1,5 @@
 
-export const getOrganizationTags = (markdown: string, links: string[], url: string) => `
+export const getOrganizationTags = (org: string, markdown: string, links: string[], url: string) => `
 ## Context:
 
 Currently Investigating the organization associated with the following URL:
@@ -11,6 +11,9 @@ ${markdown}
 
 ### Array of Links on Home Page:
 ${JSON.stringify(links)}
+
+### Currently collected data:
+${org}
 
 <!-- /Context -->
 ---

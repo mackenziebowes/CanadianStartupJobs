@@ -2,6 +2,7 @@ import type { MapData } from "@mendable/firecrawl-js";
 import { tool } from "ai";
 import z from "zod";
 import { utils } from "@/lib/firecrawl";
+import { logGeneric } from "../observability";
 
 const readPageResult = (url: string, markdown: string, links: string[]) => {
   return `
@@ -34,11 +35,16 @@ ${results.links.map((link) => {
 }
 export const readPage = tool({
   description: "Get a clean markdown view of a URL",
-  inputSchema: z.string().describe("The complete url to view"),
-  execute: async (url: string) => {
+  inputSchema: z.object({
+    url: z.string().describe("The complete url to view"),
+  }),
+  execute: async ({ url }) => {
+    logGeneric("Read Page: ", url);
     const results = await utils.getMdAndLinks(url);
     if (!results.markdown || !results.links) return "Error with site reading tool.";
-    return readPageResult(url, results.markdown, results.links);
+    const resultsPresentation = readPageResult(url, results.markdown, results.links);
+    logGeneric("Read Page Results: ", resultsPresentation);
+    return resultsPresentation;
   }
 });
 
@@ -49,8 +55,11 @@ export const searchSite = tool({
     searchTerm: z.string().describe("The term to search for across the site map"),
   }),
   execute: async ({ url, searchTerm }) => {
+    logGeneric("Search Site: ", {url, searchTerm});
     const results = await utils.searchSiteMap(url, searchTerm);
     if (!results.links) return "Error with site searching tool.";
-    return searchSiteResult(url, searchTerm, results);
+    const resultsPresentation = searchSiteResult(url, searchTerm, results);
+    logGeneric("Search Site Results: ", resultsPresentation);
+    return resultsPresentation;
   }
 });
