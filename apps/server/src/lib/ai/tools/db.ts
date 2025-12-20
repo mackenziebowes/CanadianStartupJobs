@@ -5,27 +5,49 @@ import {
   provinces as provincesCRUD,
   raisingStage as raisingStageCRUD,
   teamSize as teamSizeCRUD,
+  experienceLevels as experienceLevelsCRUD,
+  jobTypes as jobTypesCRUD,
+  roles as rolesCRUD,
 } from "@/functions/tags";
 import {
   orgPivots
 } from "@/functions/pivots/orgs";
+import {
+  jobPivots
+} from "@/functions/pivots/jobs";
 import { logGeneric } from "../observability";
 
-const tagNameSchema = z
+const orgTagNameSchema = z
   .enum(["Team Size", "Raising Stage", "Province", "Industry"])
   .describe("The readable name of a tag field");
 
-const listTagSchema = z.object({
-  tagName: tagNameSchema,
+// Job-specific tag schema
+const jobTagNameSchema = z
+  .enum(["Experience Level", "Role", "Job Type", "Province", "Industry"])
+  .describe("The readable name of a job tag field");
+
+const skipTakeSchema = z.object({
   skip: z.number().describe("Pagination Offset"),
   take: z.number().describe("List Size"),
 });
-type ListTag = z.infer<typeof listTagSchema>;
 
-export const listTags = tool({
+const listJobTagSchema = z.object({
+  tagName: jobTagNameSchema,
+  ...skipTakeSchema.shape,
+});
+
+const listOrgTagSchema = z.object({
+  tagName: orgTagNameSchema,
+  ...skipTakeSchema.shape,
+})
+
+type ListOrgTag = z.infer<typeof listOrgTagSchema>;
+type ListJobTag = z.infer<typeof listJobTagSchema>;
+
+export const listOrgTags = tool({
   description: "List existing tags in a tag field.",
-  inputSchema: listTagSchema,
-  execute: async ({ tagName, skip, take }: ListTag) => {
+  inputSchema: listOrgTagSchema,
+  execute: async ({ tagName, skip, take }: ListOrgTag) => {
     logGeneric("List Tags", { tagName, skip, take });
     switch (tagName) {
       case "Team Size":
@@ -40,7 +62,26 @@ export const listTags = tool({
   },
 });
 
-const createTagNameSchema = z.enum(["Team Size", "Raising Stage", "Industry"]).describe("The available tags for creation - only call this after confirming the tag you want to create doesn't exist.");
+export const listJobTags = tool({
+  description: "List existing tags in a tag field.",
+  inputSchema: listJobTagSchema,
+  execute: async ({ tagName, skip, take }: ListJobTag) => {
+    switch (tagName) {
+      case "Experience Level":
+        return JSON.stringify(await experienceLevelsCRUD.read(skip, take));
+      case "Job Type":
+        return JSON.stringify(await jobTypesCRUD.read(skip, take));
+      case "Role":
+        return JSON.stringify(await rolesCRUD.read(skip, take));
+      case "Province":
+        return JSON.stringify(await provincesCRUD.read(skip, take));
+      case "Industry":
+        return JSON.stringify(await industriesCRUD.read(skip, take));
+    }
+  }
+});
+
+const createTagNameSchema = z.enum(["Team Size", "Raising Stage", "Industry", "Province"]).describe("The available tags for creation - only call this after confirming the tag you want to create doesn't exist.");
 
 const createTagSchema = z.object({
   tagName: createTagNameSchema,
@@ -65,7 +106,7 @@ export const createTag = tool({
 });
 
 const connectOrgTagSchema = z.object({
-  tagName: tagNameSchema,
+  tagName: orgTagNameSchema,
   orgId: z.number().describe("The ID of the organization to add the tag to."),
   otherId: z.number().describe("The ID of the specific tag to apply to the organization."),
 });
@@ -85,6 +126,33 @@ export const connectOrgToTag = tool({
         return JSON.stringify(await orgPivots.industry.add(orgId, otherId));
       case "Province":
         return JSON.stringify(await orgPivots.province.add(orgId, otherId));
+    }
+  }
+});
+
+const connectJobTagSchema = z.object({
+  tagName: jobTagNameSchema,
+  jobId: z.number().describe("The ID of the job to add the tag to."),
+  otherId: z.number().describe("The ID of the specific tag to apply to the job."),
+});
+type ConnectJobTag = z.infer<typeof connectJobTagSchema>;
+
+export const connectJobToTag = tool({
+  description: "Connect a tag to a job by IDs",
+  inputSchema: connectJobTagSchema,
+  execute: async ({ tagName, jobId, otherId }: ConnectJobTag) => {
+    logGeneric("Connect Job Tag", { tagName, jobId, otherId });
+    switch (tagName) {
+      case "Experience Level":
+        return JSON.stringify(await jobPivots.experienceLevel.add(jobId, otherId));
+      case "Role":
+        return JSON.stringify(await jobPivots.roles.add(jobId, otherId));
+      case "Job Type":
+        return JSON.stringify(await jobPivots.jobTypes.add(jobId, otherId));
+      case "Industry":
+        return JSON.stringify(await jobPivots.industry.add(jobId, otherId));
+      case "Province":
+        return JSON.stringify(await jobPivots.provinces.add(jobId, otherId));
     }
   }
 });

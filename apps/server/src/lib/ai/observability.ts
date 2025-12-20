@@ -44,36 +44,34 @@ const logAgentActivityFooter = () => {
   console.log("=================================\n");
 }
 
-export const observePrepareSteps = (agentName: string) => async ({stepNumber, steps}: {stepNumber: number, steps: any[]}) => {
-  logAgentActivityHeader(agentName);
-  logStepNumber(stepNumber);
-
-  const lastStep = steps.at(-1);
-
-  if (!lastStep) {
-    logGeneric("Status", "Initial Step - No History");
+export const observePrepareSteps = (agentName: string) => async ({
+    stepNumber,
+    steps
+  }: {
+    stepNumber: number,
+    steps: any[]
+  }) => {
+    logAgentActivityHeader(agentName);
+    logStepNumber(stepNumber);
+    const lastStep = steps.at(-1);
+    if (!lastStep) {
+      logGeneric("Status", "Initial Step - No History");
+      logAgentActivityFooter();
+      return;
+    }
+    // Log in logical order of occurrence
+    if (lastStep.reasoning || lastStep.reasoningText) {
+      logThought(lastStep.reasoning || lastStep.reasoningText);
+    }
+    if (lastStep.toolCalls?.length) {
+      logToolCall(lastStep.toolCalls.at(-1));
+    }
+    if (lastStep.toolResults?.length) {
+      logToolResult(lastStep.toolResults.at(-1));
+    }
+    if (lastStep.text) {
+      logMessage(lastStep.text);
+    }
     logAgentActivityFooter();
-    return;
-  }
-
-  // Log in logical order of occurrence
-  if (lastStep.reasoning || lastStep.reasoningText) {
-    logThought(lastStep.reasoning || lastStep.reasoningText);
-  }
-
-  if (lastStep.toolCalls?.length) {
-    logToolCall(lastStep.toolCalls.at(-1));
-  }
-
-  if (lastStep.toolResults?.length) {
-    logToolResult(lastStep.toolResults.at(-1));
-  }
-
-  if (lastStep.text) {
-    logMessage(lastStep.text);
-  }
-
-  logAgentActivityFooter();
-
-  return {};
+    return {};
 }

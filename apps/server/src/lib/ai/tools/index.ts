@@ -1,4 +1,4 @@
-import { listTags, createTag, connectOrgToTag } from "./db";
+import { listOrgTags, listJobTags, createTag, connectOrgToTag, connectJobToTag } from "./db";
 import { readPage, searchSite } from "./firecrawl";
 
-export { listTags, createTag, connectOrgToTag, readPage, searchSite };
+export { listOrgTags, listJobTags, createTag, connectOrgToTag, connectJobToTag, readPage, searchSite };
