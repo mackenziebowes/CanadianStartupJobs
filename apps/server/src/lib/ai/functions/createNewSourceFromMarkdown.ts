@@ -1,5 +1,5 @@
 import { google } from '@ai-sdk/google';
-import { db, schemas, sources,  } from "@canadian-startup-jobs/db";
+import { db, schemas, sources } from "@canadian-startup-jobs/db";
 import { generateObject } from "ai";
 import { prompts } from '@/lib/ai/prompts';
 import { AppError, ERROR_CODES } from '@/lib/errors';

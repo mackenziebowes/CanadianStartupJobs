@@ -22,6 +22,24 @@ import {
   get_teamSize,
   update_teamSize,
 } from "./teamSize";
+import {
+  create_experienceLevels,
+  update_experienceLevels,
+  delete_experienceLevels,
+  get_experienceLevels,
+} from "./experienceLevels";
+import {
+  create_jobTypes,
+  delete_jobTypes,
+  get_jobTypes,
+  update_jobTypes,
+} from "./jobTypes";
+import {
+  create_roles,
+  delete_roles,
+  get_roles,
+  update_roles,
+} from "./roles";
 
 const industries = {
   create: create_industries,
@@ -51,4 +69,25 @@ const teamSize = {
   delete: delete_teamSize,
 };
 
-export { industries, provinces, raisingStage, teamSize };
+const experienceLevels = {
+  create: create_experienceLevels,
+  read: get_experienceLevels,
+  update: update_experienceLevels,
+  delete: delete_experienceLevels,
+};
+
+const jobTypes = {
+  create: create_jobTypes,
+  read: get_jobTypes,
+  update: update_jobTypes,
+  delete: delete_jobTypes,
+};
+
+const roles = {
+  create: create_roles,
+  read: get_roles,
+  update: update_roles,
+  delete: delete_roles,
+};
+
+export { industries, provinces, raisingStage, teamSize, experienceLevels, jobTypes, roles };

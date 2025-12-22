@@ -9,7 +9,7 @@ import {
 import {
   orgPivots
 } from "@/functions/pivots/orgs";
-import { logGeneric } from "../observability";
+import { logGeneric } from "@/lib/ai/observability";
 
 const tagNameSchema = z
   .enum(["Team Size", "Raising Stage", "Province", "Industry"])
@@ -71,7 +71,7 @@ const connectOrgTagSchema = z.object({
 });
 type ConnectOrgTag = z.infer<typeof connectOrgTagSchema>;
 
-export const connectOrgToTag = tool({
+const connectOrgToTag = tool({
   description: "Connect a tag to an organization by IDs",
   inputSchema: connectOrgTagSchema,
   execute: async ({ tagName, orgId, otherId }: ConnectOrgTag) => {
@@ -88,3 +88,11 @@ export const connectOrgToTag = tool({
     }
   }
 });
+
+export const orgTools = {
+  tags: {
+    list: listTags,
+    create: createTag,
+    connect: connectOrgToTag
+  }
+};

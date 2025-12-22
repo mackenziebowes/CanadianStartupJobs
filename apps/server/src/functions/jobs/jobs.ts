@@ -22,6 +22,7 @@
 import { eq, asc, desc } from "drizzle-orm";
 import { db, jobs } from "@canadian-startup-jobs/db";
 import { z } from "zod";
+import { AppError, ERROR_CODES } from "@/lib/errors";
 
 const jobCreateSchema = z.object({
   title: z.string(),
@@ -65,8 +66,7 @@ const orderStatement = (order?: "asc" | "desc"): typeof orderAsc => {
 // Basic CRUD
 // ==========
 
-const create_jobs = async (jobCreateArgs: jobCreate): Promise<boolean> => {
-  // todo: convert jobCreate to type jobsInsert
+const create_jobs = async (jobCreateArgs: jobCreate) => {
   const insert: jobsInsert = {
     title: jobCreateArgs.title,
     city: jobCreateArgs.city,
@@ -84,8 +84,8 @@ const create_jobs = async (jobCreateArgs: jobCreate): Promise<boolean> => {
     .insert(jobs)
     .values(insert)
     .returning({ id: jobs.id });
-  if (result.length == 0) return false;
-  return true;
+  if (result.length == 0) throw new AppError(ERROR_CODES.DB_INSERT_FAILED, "Failed to create new job", { jobCreateArgs });
+  return result[0];
 };
 
 export { create_jobs, jobCreateSchema };

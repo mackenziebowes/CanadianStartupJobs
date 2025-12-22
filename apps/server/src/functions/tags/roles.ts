@@ -13,7 +13,6 @@ const config_roles = {
   },
 };
 
-
 const orderAsc = asc(roles.id);
 const orderDesc = desc(roles.id);
 const orderStatement = (order?: "asc" | "desc"): typeof orderAsc => {
@@ -24,10 +23,9 @@ const orderStatement = (order?: "asc" | "desc"): typeof orderAsc => {
   return orderDesc;
 };
 
-
-// ==========
-// Basic CRUD
-// ==========
+// ==============
+//   Basic CRUD
+// ==============
 
 const create_roles = async (
   insert: rolesInsert,
@@ -40,7 +38,6 @@ const create_roles = async (
   if (result.length == 0) return false;
   return true;
 };
-
 
 const delete_roles = async (
   select: rolesSelect,

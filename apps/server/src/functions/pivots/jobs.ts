@@ -417,29 +417,57 @@ const get_jobsRoles_by_role = async (
   return result;
 };
 
+const industry = {
+  add: add_jobsIndustries,
+  remove: remove_jobsIndustries,
+  get_by_job: get_jobsIndustries_by_job,
+  get_by_industry: get_jobsIndustries_by_industry,
+};
+
+const experienceLevel = {
+  add: add_jobsExperienceLevels,
+  remove: remove_jobsExperienceLevels,
+  get_by_job: get_jobsExperienceLevels_by_job,
+  get_by_experienceLevel: get_jobsExperienceLevels_by_experienceLevel,
+};
+
+const jobCache = {
+  add: add_jobsJobsCaches,
+  remove: remove_jobsJobsCaches,
+  get_by_job: get_jobsJobsCaches_by_job,
+  get_by_jobCache: get_jobsJobsCaches_by_jobCache,
+};
+
+const jobType = {
+  add: add_jobsJobTypes,
+  remove: remove_jobsJobTypes,
+  get_by_job: get_jobsJobTypes_by_job,
+  get_by_jobType: get_jobsJobTypes_by_jobType
+};
+
+const provinces = {
+  add: add_jobsProvinces,
+  remove: remove_jobsProvinces,
+  get_by_job: get_jobsProvinces_by_job,
+  get_by_Provinces: get_jobsProvinces_by_province,
+}
+
+const roles = {
+  add: add_jobsRoles,
+  remove: remove_jobsRoles,
+  get_by_job: get_jobsRoles_by_job,
+  get_by_jobsRoles: get_jobsRoles_by_role,
+}
+
+const jobPivots = {
+  industry,
+  experienceLevel,
+  jobCache,
+  jobType,
+  provinces,
+  roles,
+};
+
 export {
-  add_jobsExperienceLevels,
-  remove_jobsExperienceLevels,
-  get_jobsExperienceLevels_by_job,
-  get_jobsExperienceLevels_by_experienceLevel,
-  add_jobsIndustries,
-  remove_jobsIndustries,
-  get_jobsIndustries_by_job,
-  get_jobsIndustries_by_industry,
-  add_jobsJobsCaches,
-  remove_jobsJobsCaches,
-  get_jobsJobsCaches_by_job,
-  get_jobsJobsCaches_by_jobCache,
-  add_jobsJobTypes,
-  remove_jobsJobTypes,
-  get_jobsJobTypes_by_job,
-  get_jobsJobTypes_by_jobType,
-  add_jobsProvinces,
-  remove_jobsProvinces,
-  get_jobsProvinces_by_job,
-  get_jobsProvinces_by_province,
-  add_jobsRoles,
-  remove_jobsRoles,
-  get_jobsRoles_by_job,
-  get_jobsRoles_by_role,
+  jobPivots
 };

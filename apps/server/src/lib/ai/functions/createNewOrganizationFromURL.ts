@@ -6,6 +6,7 @@ import type { GenerateTextResult, Tool } from 'ai';
 import { prompts } from '@/lib/ai/prompts';
 import { readPage, searchSite } from '@/lib/ai/tools';
 import { observePrepareSteps } from '@/lib/ai/observability';
+import { getPrimaryData, SiteExplorationTask } from '../agents/siteExplorationAgent';
 import { AppError, ERROR_CODES } from "@/lib/errors";
 import { autoTagOrganization } from '@/lib/ai/functions/autoTagOrganization';
 import { utils } from '@/lib/firecrawl';
@@ -21,19 +22,6 @@ const getHomePage = async (url: string) => {
   if (!links) throw new AppError(ERROR_CODES.FC_LINKS_FAILED, `Failed to get links for ${url}`);
   return { markdown, links };
 }
-
-const getPrimaryData = async (markdown: string, links: string[], url: string) => {
-  return await generateText({
-    model: google('gemini-2.5-pro'),
-    prompt: prompts.discoverNewOrganization(markdown, links, url),
-    tools: {
-      readPage,
-      searchSite,
-    },
-    prepareStep: observePrepareSteps("Primary"),
-  });
-}
-
 
 
 const getObjectData = async (url: string, primaryData: GenerateTextResult<{
@@ -62,7 +50,13 @@ const getObjectData = async (url: string, primaryData: GenerateTextResult<{
 
 export const createNewOrganizationFromURL = async (url: string) => {
   const { markdown, links } = await getHomePage(url);
-  const primaryData = await getPrimaryData(markdown, links, url);
+  const primaryData = await getPrimaryData({
+    markdown,
+    links,
+    url,
+    task: SiteExplorationTask.DISCOVER_ORGANIZATION,
+    name: "Organization Primary Data"
+  });
   const objectData = await getObjectData(url, primaryData);
 
   const uploadValues = schemas.organizations.insert.omit({
