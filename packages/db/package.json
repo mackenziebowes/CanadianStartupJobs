@@ -20,6 +20,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "bun run src/scripts/seed.ts",
+    "db:benchmark": "bun run src/scripts/benchmark-manager.ts",
     "docs": "bun run src/scripts/generate-docs.ts"
   },
   "dependencies": {

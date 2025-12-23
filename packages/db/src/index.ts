@@ -174,11 +174,17 @@ const connectionString =
   `postgresql://${process.env.POSTGRES_USER || "postgres"}:${process.env.POSTGRES_PASSWORD || "postgres"}@${process.env.POSTGRES_HOST || "localhost"}:${process.env.POSTGRES_PORT || "5433"}/${process.env.POSTGRES_DB || "canadian_startup_db"}`;
 
 // Create postgres client
-const client = postgres(connectionString, {
-  max: 10,
-  idle_timeout: 20,
-  connect_timeout: 10,
-});
+const client = postgres(
+  process.env.DB_SCHEMA
+    ? `${connectionString}${connectionString.includes("?") ? "&" : "?"}options=-c%20search_path%3D${process.env.DB_SCHEMA}`
+    : connectionString,
+  {
+    max: 10,
+    idle_timeout: 20,
+    connect_timeout: 10,
+    onnotice: () => {}, // suppress notices
+  }
+);
 
 // Create drizzle instance
 export const db = drizzle(client, {
