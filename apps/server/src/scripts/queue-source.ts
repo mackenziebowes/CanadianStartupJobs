@@ -1,5 +1,5 @@
 import { addToQueue } from "@/db/functions/queues";
-import { startLlMCallWorker, stopLlMCallWorker, isWorkerRunning } from "@/workers/llmCallWorker";
+import { runWorker } from "@/workers/runWorker";
 
 interface SourceConfig {
   name: string;
@@ -81,42 +81,15 @@ const processSources = async (sources: SourceConfig[]) => {
   console.log("\n" + "=" .repeat(50));
   console.log(`📊 Summary: ${jobIds.length} sources queued for processing`);
   console.log("   Job IDs:", jobIds.join(", "));
-  console.log("\n🔄 Starting LLM call worker...");
-  console.log("   The worker will process the queue and discover:");
-  console.log("   1. Sources (VC firms)");
-  console.log("   2. Organizations (portfolio companies)");
-  console.log("   3. Jobs (open positions)");
-  console.log("\n   Press Ctrl+C to stop the worker\n");
 
-  // Start the worker
-  startLlMCallWorker({
+  runWorker({
     pollIntervalMs: 2000,
-    rateLimitPerSec: 2, // Conservative rate limit to avoid overwhelming APIs
+    rateLimitPerSec: 2,
   });
-
-  // Keep the process running until interrupted
-  const gracefulShutdown = async (signal: string) => {
-    console.log(`\n\n⚠️  Received ${signal}, stopping worker...`);
-    await stopLlMCallWorker();
-    console.log("✅ Worker stopped. Goodbye!");
-    process.exit(0);
-  };
-
-  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-
-  // Prevent the script from exiting
-  await new Promise(() => {});
 };
 
 // Main function
 const main = async () => {
-  if (isWorkerRunning()) {
-    console.log("⚠️  Worker is already running. Please stop it first.");
-    console.log("   Or modify this script to queue sources without starting the worker.");
-    process.exit(1);
-  }
-
   // Parse command line arguments
   const args = process.argv.slice(2);
 

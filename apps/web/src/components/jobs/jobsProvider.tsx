@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import jobsSource from "@/data/jobs.json" assert { type: "json" };
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { jobsApi, type Job as ApiJob } from "@/data/api/jobs";
 import {
   DEFAULT_FILTERS,
   FilterState,
@@ -23,6 +23,21 @@ type Job = {
   [key: string]: unknown;
 };
 
+// Map API job to frontend Job type
+const mapApiJobToFrontend = (apiJob: ApiJob): Job => ({
+  id: apiJob.id.toString(),
+  title: apiJob.title,
+  company: apiJob.company,
+  description: apiJob.description,
+  location: `${apiJob.city}, ${apiJob.province}`,
+  province: apiJob.province,
+  applyUrl: apiJob.posting_url || apiJob.job_board_url,
+  jobType: undefined,
+  experience: undefined,
+  industry: undefined,
+  role: undefined,
+});
+
 type JobsContextValue = {
   jobsById: Record<string, Job>;
   jobIds: string[];
@@ -35,29 +50,46 @@ type JobsContextValue = {
   selectedJobId: string | null;
   selectedJob: Job | null;
   selectJob: (id: string) => void;
+  isLoading: boolean;
 };
 
 const JobsContext = createContext<JobsContextValue | undefined>(undefined);
 
-const jobsByIdStatic: Record<string, Job> = Object.entries(jobsSource as Record<string, Omit<Job, "id">>).reduce(
-  (acc, [id, data]) => {
-    acc[id] = { id, ...data } as Job;
-    return acc;
-  },
-  {} as Record<string, Job>
-);
-
-const jobIdsStatic = Object.keys(jobsByIdStatic);
-
 export function JobsProvider({ children }: { children: React.ReactNode }) {
+  const [jobsById, setJobsById] = useState<Record<string, Job>>({});
   const [searchTerm, setSearchTermState] = useState("");
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(jobIdsStatic[0] ?? null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const jobIds = Object.keys(jobsById);
+
+  // Fetch jobs from API on mount
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        setIsLoading(true);
+        const apiJobs = await jobsApi.list();
+        const mappedJobs = apiJobs.map(mapApiJobToFrontend);
+        console.log({ mappedJobs });
+        const jobsMap: Record<string, Job> = {};
+        mappedJobs.forEach((job) => {
+          jobsMap[job.id] = job;
+        });
+        setJobsById(jobsMap);
+      } catch (error) {
+        console.error("Failed to fetch jobs:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchJobs();
+  }, []);
 
   const filteredJobIds = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    return jobIdsStatic.filter((id) => {
-      const job = jobsByIdStatic[id];
+    return jobIds.filter((id) => {
+      const job = jobsById[id];
       if (!job) return false;
 
       const passesFilters = FILTER_DROPDOWN_CONFIG.every(({ key, defaultValue }) => {
@@ -78,7 +110,7 @@ export function JobsProvider({ children }: { children: React.ReactNode }) {
   }, [filters, searchTerm]);
 
   const filteredJobs = useMemo(
-    () => filteredJobIds.map((id) => jobsByIdStatic[id]).filter(Boolean),
+    () => filteredJobIds.map((id) => jobsById[id]).filter(Boolean),
     [filteredJobIds]
   );
 
@@ -93,15 +125,15 @@ export function JobsProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const selectJob = useCallback((id: string) => {
-    if (jobsByIdStatic[id]) {
+    if (jobsById[id]) {
       setSelectedJobId(id);
     }
-  }, []);
+  }, [jobsById]);
 
   const value = useMemo<JobsContextValue>(
     () => ({
-      jobsById: jobsByIdStatic,
-      jobIds: jobIdsStatic,
+      jobsById,
+      jobIds,
       filteredJobIds,
       filteredJobs,
       searchTerm,
@@ -109,10 +141,11 @@ export function JobsProvider({ children }: { children: React.ReactNode }) {
       filters,
       setFilters,
       selectedJobId: activeJobId,
-      selectedJob: activeJobId ? jobsByIdStatic[activeJobId] ?? null : null,
+      selectedJob: activeJobId ? jobsById[activeJobId] ?? null : null,
       selectJob,
+      isLoading,
     }),
-    [filteredJobIds, filteredJobs, searchTerm, setSearchTerm, filters, setFilters, activeJobId, selectJob]
+    [filteredJobIds, filteredJobs, searchTerm, setSearchTerm, filters, setFilters, activeJobId, selectJob, isLoading]
   );
 
   return <JobsContext.Provider value={value}>{children}</JobsContext.Provider>;

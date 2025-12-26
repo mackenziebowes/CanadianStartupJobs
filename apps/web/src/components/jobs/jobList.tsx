@@ -64,9 +64,9 @@ export default function JobList(props: JobListProps = {}) {
     };
   }, [isMobile, filteredJobs.length, firstJobKey]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [isMobile, jobCount]);
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [isMobile, jobCount]);
 
   const handleJobClick = (jobId: string) => {
     if (isMobile) {

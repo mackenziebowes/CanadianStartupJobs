@@ -1,10 +1,17 @@
-import { eq, asc } from "drizzle-orm";
+import { eq, asc, sql } from "drizzle-orm";
 import { db, queues, schemas } from "@canadian-startup-jobs/db";
 import { z } from "zod";
 import { AppError, ERROR_CODES } from "@/lib/errors";
 
 const getNextQueuedItem = async () => {
-  const response = await db.select().from(queues).where(eq(queues.status, "queued")).orderBy(asc(queues.createdAt)).limit(1);
+  const response = await db.select().from(queues).where(eq(queues.status, "queued")).orderBy(sql`CASE
+    WHEN ${queues.agent} = 'jobAgent' THEN 1
+    WHEN ${queues.agent} = 'jobBoardAgent' THEN 2
+    WHEN ${queues.agent} = 'organizationAgent' THEN 3
+    WHEN ${queues.agent} = 'portfolioLinksAgent' THEN 4
+    WHEN ${queues.agent} = 'sourceAgent' THEN 5
+  END`,
+  asc(queues.createdAt)).limit(1);
   if (!response[0]) throw new AppError(ERROR_CODES.DB_QUERY_FAILED, "No remaining tasks");
   return response[0];
 };

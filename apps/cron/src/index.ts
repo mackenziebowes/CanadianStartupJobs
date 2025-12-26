@@ -33,6 +33,6 @@ const getAllJobs = async () => {
   }
 };
 
-getAllJobs().catch((error) => {
-  process.exit(1);
-});
+// getAllJobs().catch((error) => {
+//   process.exit(1);
+// });
