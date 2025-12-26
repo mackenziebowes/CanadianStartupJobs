@@ -3,7 +3,7 @@ import {
   update_raisingStage,
   delete_raisingStage,
   get_raisingStage,
-} from "@/functions/tags/raisingStage";
+} from "@/db/functions/tags/raisingStage";
 import { Hono } from "hono";
 
 const app = new Hono();

@@ -1,5 +1,5 @@
-import { createTagFunctions } from "@/functions/generators/createTagFunctions";
-import { createTagRoutes } from "@/functions/generators/createTagRoutes";
+import { createTagFunctions } from "@/db/functions/generators/createTagFunctions";
+import { createTagRoutes } from "@/db/functions/generators/createTagRoutes";
 import { join } from "node:path";
 
 const tagsToCreate = [
@@ -15,7 +15,7 @@ async function generateTagFunctions() {
   console.log("Starting Tag Generation...");
   await Promise.all(
     tagsToCreate.map(async (tag, index) => {
-      const functionFile = join("./src/functions/tags", `${tag}.ts`);
+      const functionFile = join("./src/db/functions/tags", `${tag}.ts`);
       const routeFile = join("./src/routes/tags", `${tag}.ts`);
       console.log(`${index}: Writing crud functions to ${functionFile}...`);
       const functions = createTagFunctions(tag);

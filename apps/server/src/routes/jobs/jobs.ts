@@ -19,7 +19,7 @@
 // | `created_at` | `date` | Yes | `[object Object]` |
 // | `updated_at` | `date` | Yes | `[object Object]` |
 
-import { create_jobs, jobCreateSchema } from "@/functions/jobs/jobs";
+import { create_jobs, jobCreateSchema } from "@/db/functions/jobs/jobs";
 import { Hono } from "hono";
 
 const app = new Hono();

@@ -3,7 +3,7 @@ import {
   update_industries,
   delete_industries,
   get_industries,
-} from "@/functions/tags/industries";
+} from "@/db/functions/tags/industries";
 import { Hono } from "hono";
 
 const app = new Hono();

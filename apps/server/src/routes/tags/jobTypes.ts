@@ -3,7 +3,7 @@ import {
   update_jobTypes,
   delete_jobTypes,
   get_jobTypes,
-} from "@/functions/tags/jobTypes";
+} from "@/db/functions/tags/jobTypes";
 import { Hono } from "hono";
 
 const app = new Hono();

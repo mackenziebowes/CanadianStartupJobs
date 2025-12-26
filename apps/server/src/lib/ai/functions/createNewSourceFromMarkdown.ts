@@ -11,7 +11,7 @@ const insertSource = async (source: NewSource) => {
 
 export const createNewSourceFromMarkdown = async (markdown: string, url: string, portfolio: string) => {
   const objectData = await generateObject({
-    model: google('gemini-2.5-pro-latest'),
+    model: google('gemini-2.5-flash'),
     schema: schemas.sources.insert.omit({
         id: true,
         createdAt: true,
@@ -26,5 +26,5 @@ export const createNewSourceFromMarkdown = async (markdown: string, url: string,
     portfolio: portfolio,
   });
   if (!newSource[0]) throw new AppError(ERROR_CODES.DB_INSERT_FAILED, "Failed to insert source to db");
-  return newSource;
+  return newSource[0];
 };

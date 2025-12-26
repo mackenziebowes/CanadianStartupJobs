@@ -3,7 +3,7 @@ import {
   update_teamSize,
   delete_teamSize,
   get_teamSize,
-} from "@/functions/tags/teamSize";
+} from "@/db/functions/tags/teamSize";
 import { Hono } from "hono";
 
 const app = new Hono();

@@ -6,14 +6,10 @@ import {
   experienceLevels as experienceLevelsCRUD,
   jobTypes as jobTypesCRUD,
   roles as rolesCRUD,
-} from "@/functions/tags";
-import {
-  create_jobs,
-  jobCreateSchema,
-} from "@/functions/jobs/jobs";
+} from "@/db/functions/tags";
 import {
   jobPivots
-} from "@/functions/pivots/jobs";
+} from "@/db/functions/pivots/jobs";
 import { logGeneric } from "@/lib/ai/observability";
 
 const tagNameSchema = z

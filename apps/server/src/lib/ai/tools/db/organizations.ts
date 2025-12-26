@@ -5,10 +5,10 @@ import {
   provinces as provincesCRUD,
   raisingStage as raisingStageCRUD,
   teamSize as teamSizeCRUD,
-} from "@/functions/tags";
+} from "@/db/functions/tags";
 import {
   orgPivots
-} from "@/functions/pivots/orgs";
+} from "@/db/functions/pivots/orgs";
 import { logGeneric } from "@/lib/ai/observability";
 
 const tagNameSchema = z

@@ -4,7 +4,7 @@ const createImportStatement = (tableName: string) => {
   update_${tableName},
   delete_${tableName},
   get_${tableName},
-} from "@/functions/tags/${tableName}";
+} from "@/db/functions/tags/${tableName}";
 import { Hono } from "hono";
 
 const app = new Hono();`;

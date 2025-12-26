@@ -27,6 +27,8 @@ import {
   sources,
   portfolioCaches,
   sourcesPortfolioCaches,
+  calls,
+  queues
 } from "./schema/index";
 import { createSchemaFactory } from "drizzle-zod";
 const { createInsertSchema, createSelectSchema, createUpdateSchema } = createSchemaFactory({
@@ -166,6 +168,16 @@ const schemas = {
     insert: createInsertSchema(sourcesPortfolioCaches),
     update: createUpdateSchema(sourcesPortfolioCaches),
   },
+  calls: {
+    select: createSelectSchema(calls),
+    insert: createInsertSchema(calls),
+    update: createUpdateSchema(calls),
+  },
+  queues: {
+    select: createSelectSchema(queues),
+    insert: createInsertSchema(queues),
+    update: createUpdateSchema(queues),
+  },
 };
 
 // Get database connection string from environment variables
@@ -215,6 +227,8 @@ export const db = drizzle(client, {
     sources,
     portfolioCaches,
     sourcesPortfolioCaches,
+    calls,
+    queues
   },
 });
 
@@ -248,6 +262,8 @@ export {
   sources,
   portfolioCaches,
   sourcesPortfolioCaches,
+  calls,
+  queues
 };
 
 // Export types

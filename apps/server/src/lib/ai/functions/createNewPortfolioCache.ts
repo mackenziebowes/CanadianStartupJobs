@@ -1,6 +1,7 @@
 import { db, schemas, portfolioCaches, sourcesPortfolioCaches } from "@canadian-startup-jobs/db";
 import { SHA256 } from "bun";
 import { AppError,ERROR_CODES } from "@/lib/errors";
+
 export async function createNewPortfolioCache(url: string) {
   const htmlPayload = await fetch(url);
   const hasher = new SHA256();

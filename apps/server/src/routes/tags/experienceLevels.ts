@@ -3,7 +3,7 @@ import {
   update_experienceLevels,
   delete_experienceLevels,
   get_experienceLevels,
-} from "@/functions/tags/experienceLevels";
+} from "@/db/functions/tags/experienceLevels";
 import { Hono } from "hono";
 
 const app = new Hono();

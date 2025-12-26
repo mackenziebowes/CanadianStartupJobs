@@ -3,7 +3,7 @@ import {
   update_provinces,
   delete_provinces,
   get_provinces,
-} from "@/functions/tags/provinces";
+} from "@/db/functions/tags/provinces";
 import { Hono } from "hono";
 
 const app = new Hono();

@@ -3,7 +3,7 @@ import {
   update_roles,
   delete_roles,
   get_roles,
-} from "@/functions/tags/roles";
+} from "@/db/functions/tags/roles";
 import { Hono } from "hono";
 
 const app = new Hono();
