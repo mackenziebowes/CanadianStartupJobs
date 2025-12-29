@@ -140,3 +140,6 @@ vite.config.ts.timestamp-*
 
 # Ignore all in prompts dir
 /prompts/
+
+# Bun artifacts
+bun.lock
