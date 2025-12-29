@@ -143,3 +143,6 @@ vite.config.ts.timestamp-*
 
 # Bun artifacts
 bun.lock
+
+# Crush artifacts
+AGENTS.md
