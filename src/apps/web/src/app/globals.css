@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "../styles/main.css";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Font faces (adjust file names if different) */
+@font-face {
+  font-family: "Soehne";
+  src: url("/job-board/fonts/soehne-buch.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Soehne";
+  src: url("/job-board/fonts/soehne-buch-kursiv.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Soehne";
+  src: url("/job-board/fonts/soehne-kraftig.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Soehne";
+  src: url("/job-board/fonts/soehne-kraftig-kursiv.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Founders Grotesk Mono";
+  src: url("/job-board/fonts/founders-grotesk-mono-light.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Optional additional weights */
+/* @font-face { font-family:"Soehne Kraftig"; src:url("/job-board/fonts/SoehneKraftig-Bold.woff2") format("woff2"); font-weight:700; font-style:normal; font-display:swap; } */
+
+:root {
+  --font-mono: "Founders Grotesk Mono", Arial, sans-serif;
+  --font-sans: "Soehne Kraftig", sans-serif;
+  /* Job List Scroll Container */
+  --jl-h: max(calc(100dvh - 16rem), 32rem);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
